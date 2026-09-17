@@ -26,6 +26,26 @@ export interface ChatTurn {
   content: string;
 }
 
+/** Interface language of the operator making the request. */
+export type AiLanguage = "en" | "hi";
+
+/**
+ * Language contract appended to every CivicX system prompt.
+ *
+ * Only human-readable wording follows the operator's language. JSON keys,
+ * enum values, statuses and ids stay in their exact internal English form so
+ * the stored data and workflow logic never change.
+ */
+export function languageDirective(language: AiLanguage): string {
+  const chosen = language === "hi" ? "Hindi (हिंदी, Devanagari script)" : "English";
+  return `RESPONSE LANGUAGE (strict):
+- The operator's chosen CivicX interface language is ${chosen}. Write every human-readable sentence, summary, label text, reason and recommendation in that language.
+- Follow the user's own writing when it differs: text written in English gets an English answer; text written in Hindi gets a Hindi answer in Devanagari; text written in Hinglish (Hindi typed in Latin letters, or mixed Hindi-English) must be understood and answered in natural conversational Hindi, keeping the common English words people actually use.
+- Keep simple, everyday wording. Do not use rare or heavily Sanskritised Hindi.
+- NEVER translate machine values: JSON keys, enum values (for example REPORTED, AI_ANALYSIS, AI_ANALYSIS_COMPLETE, FAILED, LOW, MEDIUM, HIGH, CRITICAL, NORMAL, SAME_ISSUE, POSSIBLE_DUPLICATE, DIFFERENT_ISSUE, LINK_TO_EXISTING, REVIEW, KEEP_SEPARATE, PRIMARY, NONE), field names, uuids, ids, urls, numbers and the brand name CivicX. These stay exactly as specified, in English.
+- If the output format is JSON, keep the structure and the enum values identical and translate only the free-text values.`;
+}
+
 type Provider = "lovable-gateway" | "google-direct";
 
 export interface AiConfigStatus {
@@ -141,8 +161,11 @@ export async function callGemini(options: {
   /** Either a single user prompt, or a full conversation. */
   prompt?: string;
   turns?: ChatTurn[];
+  /** Interface language chosen by the operator. Defaults to English. */
+  language?: AiLanguage;
 }): Promise<string> {
-  const { feature, system } = options;
+  const { feature } = options;
+  const system = `${options.system}\n\n${languageDirective(options.language ?? "en")}`;
   const turns: ChatTurn[] = options.turns?.length
     ? options.turns
     : [{ role: "user", content: options.prompt ?? "" }];
