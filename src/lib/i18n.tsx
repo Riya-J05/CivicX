@@ -38,7 +38,7 @@ export function translateText(value: string, language: Language): string {
   if (language === "en") return value;
   const trimmed = value.trim();
   if (trimmed.length === 0) return value;
-  const hit = hindi[trimmed];
+  const hit = hindi[trimmed] ?? hindi[trimmed.replace(/\s+/g, " ")];
   if (!hit) return value;
   const lead = value.slice(0, value.indexOf(trimmed[0]!));
   const tail = value.slice(lead.length + trimmed.length);
