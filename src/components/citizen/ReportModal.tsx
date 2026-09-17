@@ -20,6 +20,7 @@ import {
 import { formatCoords, type SelectedLocation } from "@/lib/location";
 import { LocationPicker } from "./LocationPicker";
 import { VideoEvidence, type SelectedVideo, type VideoUploadStatus } from "./VideoEvidence";
+import { SpeechToTextButton } from "./SpeechToText";
 import { uploadVideoEvidence, videoErrorMessage } from "@/lib/video-evidence";
 
 import { AiAnalysis } from "./AiAnalysis";
@@ -393,6 +394,15 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                               onChange={(e) => setDraft((d) => ({ ...d, description: e.target.value }))}
                               placeholder="Describe what you see, how often it happens and who it affects."
                               className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
+                            />
+                            <SpeechToTextButton
+                              onText={(text) =>
+                                setDraft((d) => {
+                                  const base = d.description.trimEnd();
+                                  const next = (base ? `${base} ` : "") + text;
+                                  return next.length <= MAX_DESC ? { ...d, description: next } : d;
+                                })
+                              }
                             />
                           </Field>
 
