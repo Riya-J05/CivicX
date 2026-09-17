@@ -11,7 +11,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
@@ -103,11 +103,14 @@ Rules:
 - You are advisory. Never state certainty; phrase the reason as a likelihood.
 - Include exactly one object per candidate, using the candidate_id given.`;
 
-async function classify(prompt: string): Promise<unknown> {
+const readLanguage = (value: unknown): AiLanguage => (value === "hi" ? "hi" : "en");
+
+async function classify(prompt: string, language: AiLanguage): Promise<unknown> {
   const content = await callGemini({
     feature: "duplicates",
     system: SYSTEM_PROMPT,
     prompt,
+    language,
   });
 
   const fenced = content.match(/```(?:json)?\s*([\s\S]*?)```/);
@@ -124,10 +127,10 @@ async function classify(prompt: string): Promise<unknown> {
  */
 export const detectDuplicates = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { challengeId: string }) => {
+  .inputValidator((input: { challengeId: string; language?: string }) => {
     const id = String(input?.challengeId ?? "").trim();
     if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("A valid challenge id is required.");
-    return { challengeId: id };
+    return { challengeId: id, language: readLanguage(input?.language) };
   })
   .handler(async ({ data, context }): Promise<DuplicateMatch[]> => {
     const { supabase, userId } = context;
@@ -212,7 +215,7 @@ export const detectDuplicates = createServerFn({ method: "POST" })
 
     let verdicts: Array<Record<string, unknown>> = [];
     try {
-      const parsed = await classify(prompt);
+      const parsed = await classify(prompt, data.language);
       verdicts = Array.isArray(parsed) ? (parsed as Array<Record<string, unknown>>) : [];
     } catch (err) {
       console.error("[civicx] duplicate classification failed", err);

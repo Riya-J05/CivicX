@@ -9,7 +9,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
@@ -106,9 +106,11 @@ Rules:
 - "implementation_complexity" describes how hard delivery is, where HIGH means hard.
 - Give 2-4 strengths, 2-4 risks and 2-4 recommendations. Word everything so it is clear this is an AI assessment, not verified fact.`;
 
-async function callModel(prompt: string): Promise<string> {
+const readLanguage = (value: unknown): AiLanguage => (value === "hi" ? "hi" : "en");
+
+async function callModel(prompt: string, language: AiLanguage): Promise<string> {
   try {
-    return await callGemini({ feature: "proposal-review", system: SYSTEM_PROMPT, prompt });
+    return await callGemini({ feature: "proposal-review", system: SYSTEM_PROMPT, prompt, language });
   } catch {
     throw new ReviewUnavailableError();
   }
@@ -126,10 +128,10 @@ interface PhaseShape {
  */
 export const reviewProposal = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { proposalId: string }) => {
+  .inputValidator((input: { proposalId: string; language?: string }) => {
     const id = String(input?.proposalId ?? "").trim();
     if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("A valid proposal id is required.");
-    return { proposalId: id };
+    return { proposalId: id, language: readLanguage(input?.language) };
   })
   .handler(async ({ data, context }) => {
     const { supabase } = context;
@@ -235,7 +237,7 @@ export const reviewProposal = createServerFn({ method: "POST" })
 
     let review: ProposalAiReview;
     try {
-      review = parseReview(await callModel(prompt));
+      review = parseReview(await callModel(prompt, data.language));
     } catch (err) {
       console.error("[civicx] proposal AI review failed", err);
       await supabase

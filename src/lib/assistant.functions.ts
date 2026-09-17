@@ -8,7 +8,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 

@@ -15,7 +15,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 import {
   baselineRequirements,
@@ -85,8 +85,10 @@ Rules:
 - If an institution has very little recorded capability data, say plainly that its recorded capability data is limited.
 - Include exactly one object per institution, using the profile_id given.`;
 
-async function callModel(system: string, user: string): Promise<string> {
-  return callGemini({ feature: "institution-matching", system, prompt: user });
+const readLanguage = (value: unknown): AiLanguage => (value === "hi" ? "hi" : "en");
+
+async function callModel(system: string, user: string, language: AiLanguage): Promise<string> {
+  return callGemini({ feature: "institution-matching", system, prompt: user, language });
 }
 
 function extractJson(raw: string, open: "{" | "["): string {
@@ -123,10 +125,10 @@ function mergeUnique(...lists: string[][]): string[] {
 
 export const matchInstitutions = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { challengeId: string }) => {
+  .inputValidator((input: { challengeId: string; language?: string }) => {
     const id = String(input?.challengeId ?? "").trim();
     if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("A valid challenge id is required.");
-    return { challengeId: id };
+    return { challengeId: id, language: readLanguage(input?.language) };
   })
   .handler(async ({ data, context }): Promise<InstitutionMatchResult> => {
     const { supabase, userId } = context;

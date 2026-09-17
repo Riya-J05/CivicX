@@ -7,7 +7,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
@@ -191,9 +191,11 @@ Threat assessment rules (safety critical):
 - "recommended_service" must be "PRIMARY" (112) whenever multiple services or immediate life safety are involved.`;
 
 
-async function callModel(prompt: string): Promise<string> {
+const readLanguage = (value: unknown): AiLanguage => (value === "hi" ? "hi" : "en");
+
+async function callModel(prompt: string, language: AiLanguage): Promise<string> {
   try {
-    return await callGemini({ feature: "analysis", system: SYSTEM_PROMPT, prompt });
+    return await callGemini({ feature: "analysis", system: SYSTEM_PROMPT, prompt, language });
   } catch {
     throw new AnalysisUnavailableError();
   }
@@ -205,10 +207,10 @@ async function callModel(prompt: string): Promise<string> {
  */
 export const analyzeChallenge = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
-  .inputValidator((input: { challengeId: string }) => {
+  .inputValidator((input: { challengeId: string; language?: string }) => {
     const id = String(input?.challengeId ?? "").trim();
     if (!/^[0-9a-f-]{36}$/i.test(id)) throw new Error("A valid challenge id is required.");
-    return { challengeId: id };
+    return { challengeId: id, language: readLanguage(input?.language) };
   })
   .handler(async ({ data, context }): Promise<ChallengeAiAnalysis> => {
     const { supabase, userId } = context;
@@ -250,7 +252,7 @@ export const analyzeChallenge = createServerFn({ method: "POST" })
 
     let analysis: ChallengeAiAnalysis;
     try {
-      analysis = parseAnalysis(await callModel(prompt));
+      analysis = parseAnalysis(await callModel(prompt, data.language));
     } catch (err) {
       console.error("[civicx] AI analysis failed", err);
       await supabase
