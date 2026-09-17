@@ -30,6 +30,7 @@ import {
 import { useServerFn } from "@tanstack/react-start";
 import { analyzeChallenge } from "@/lib/analysis.functions";
 import { detectDuplicates, type DuplicateMatch } from "@/lib/duplicates.functions";
+import { useLanguage } from "@/lib/i18n";
 import { toAnalysisResult } from "@/lib/analysis-result";
 
 import { cn } from "@/lib/utils";
@@ -91,6 +92,7 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
   const [analysisError, setAnalysisError] = useState<string | null>(null);
   const [challengeId, setChallengeId] = useState<string | null>(null);
   const [duplicates, setDuplicates] = useState<DuplicateMatch[]>([]);
+  const { language } = useLanguage();
   const runAnalysis = useServerFn(analyzeChallenge);
   const runDuplicateCheck = useServerFn(detectDuplicates);
 
@@ -131,7 +133,7 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
    */
   const checkDuplicates = async (id: string) => {
     try {
-      setDuplicates(await runDuplicateCheck({ data: { challengeId: id } }));
+      setDuplicates(await runDuplicateCheck({ data: { challengeId: id, language } }));
     } catch (err) {
       console.error("[civicx] duplicate detection unavailable", err);
       setDuplicates([]);
@@ -144,7 +146,7 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
     setAnalysisError(null);
     setDuplicates([]);
     try {
-      const result = await runAnalysis({ data: { challengeId: id } });
+      const result = await runAnalysis({ data: { challengeId: id, language } });
       setAnalysis(toAnalysisResult(result, id));
       window.dispatchEvent(new Event(CHALLENGE_CREATED_EVENT));
       void checkDuplicates(id);

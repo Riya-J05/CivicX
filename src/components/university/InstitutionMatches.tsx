@@ -8,6 +8,7 @@ import {
   type InstitutionMatchResult,
 } from "@/lib/institution-matching.functions";
 import { cn } from "@/lib/utils";
+import { useLanguage } from "@/lib/i18n";
 
 /**
  * Level 1 of CivicX matching: which institutions are best suited to this
@@ -22,6 +23,7 @@ export function InstitutionMatches({
   challengeId: string;
   ownProfileId: string | null;
 }) {
+  const { language } = useLanguage();
   const run = useServerFn(matchInstitutions);
   const [result, setResult] = useState<InstitutionMatchResult | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -32,7 +34,7 @@ export function InstitutionMatches({
     setError(null);
     void (async () => {
       try {
-        setResult(await run({ data: { challengeId } }));
+        setResult(await run({ data: { challengeId, language } }));
       } catch (err) {
         console.error("[civicx] institution matching failed", err);
         setError("Institution matching is unavailable right now. You can retry.");
@@ -49,7 +51,7 @@ export function InstitutionMatches({
     setLoading(true);
     void (async () => {
       try {
-        const data = await run({ data: { challengeId } });
+        const data = await run({ data: { challengeId, language } });
         if (!cancelled) setResult(data);
       } catch (err) {
         console.error("[civicx] institution matching failed", err);

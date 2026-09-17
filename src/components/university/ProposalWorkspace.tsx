@@ -32,6 +32,7 @@ import {
   type ProposalRow,
 } from "@/lib/proposals-service";
 import { reviewProposal } from "@/lib/proposal-review.functions";
+import { useLanguage } from "@/lib/i18n";
 import type { ChallengeRow } from "@/lib/challenges-service";
 import type { TeamWithMembers } from "@/lib/teams-service";
 import { ProposalReviewPanel } from "./ProposalReviewPanel";
@@ -143,7 +144,7 @@ export function ProposalWorkspace({
       setReviewing(true);
       setProgressStep(0);
       try {
-        const result = await reviewProposal({ data: { proposalId } });
+        const result = await reviewProposal({ data: { proposalId, language } });
         setReview(result.review as ProposalReviewRow);
         await load();
         onChanged?.();

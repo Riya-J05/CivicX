@@ -6,6 +6,7 @@ import ReactMarkdown from "react-markdown";
 import { useAuth } from "@/lib/auth-context";
 import { useAssistantContext } from "@/lib/assistant-context";
 import { askCivicxAi } from "@/lib/assistant.functions";
+import { useLanguage } from "@/lib/i18n";
 import type { RoleId } from "@/lib/civicx-roles";
 
 interface ChatMessage {
@@ -68,6 +69,7 @@ export function CivicxAssistant() {
   const { currentUser, role } = useAuth();
   const { focus } = useAssistantContext();
   const reduced = useReducedMotion() ?? false;
+  const { language } = useLanguage();
   const ask = useServerFn(askCivicxAi);
 
   const [open, setOpen] = useState(false);
@@ -109,6 +111,7 @@ export function CivicxAssistant() {
           data: {
             question: text,
             history,
+            language,
             focus: {
               missionId: focus.missionId ?? null,
               teamId: focus.teamId ?? null,
