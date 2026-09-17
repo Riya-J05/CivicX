@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { FileText, MapPin, X } from "lucide-react";
+import { formatBytes, formatDuration } from "@/lib/video-evidence";
 import { PriorityChip, StatusChip } from "@/components/civicx/StatusChip";
 import { MissionProgress } from "@/components/civicx/MissionProgress";
 import { statusStage } from "@/lib/civicx-data";
