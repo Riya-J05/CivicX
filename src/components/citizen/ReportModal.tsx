@@ -395,6 +395,16 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                               placeholder="Describe what you see, how often it happens and who it affects."
                               className="w-full resize-none bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
                             />
+                            <SpeechToTextButton
+                              onText={(text) =>
+                                setDraft((d) => ({
+                                  ...d,
+                                  description: (d.description.trimEnd() ? `${d.description.trimEnd()} ` : "") + text,
+                                }).description.length <= MAX_DESC
+                                  ? { ...d, description: (d.description.trimEnd() ? `${d.description.trimEnd()} ` : "") + text }
+                                  : d)
+                              }
+                            />
                           </Field>
 
                           <div>
