@@ -127,8 +127,8 @@ export function SpeechToTextButton({
 
     recognition.onend = () => {
       recognitionRef.current = null;
-      setStatus((current) => (current === "listening" ? (message ? "error" : "idle") : current));
-      if (!stoppingRef.current && !message) setStatus("idle");
+      // If onerror already moved us to "error", keep that state.
+      setStatus((current) => (current === "listening" ? "idle" : current));
     };
 
     try {
