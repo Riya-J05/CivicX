@@ -128,6 +128,13 @@ export async function uploadChallengeEvidence(
         file_url: path,
         file_type: file.type || null,
         file_name: file.name,
+        evidence_type: file.type.startsWith("image/")
+          ? "image"
+          : file.type.startsWith("video/")
+            ? "video"
+            : "document",
+        file_size: file.size,
+        uploaded_by: userId,
       })
       .select()
       .single();

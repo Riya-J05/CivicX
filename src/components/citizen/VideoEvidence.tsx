@@ -1,5 +1,5 @@
 /**
- * Video evidence控件 for the citizen report form.
+ * Video evidence controls for the citizen report form.
  *
  * Handles picking a video from the device and recording one with the camera
  * through MediaRecorder. The chosen clip stays a local object URL until the
