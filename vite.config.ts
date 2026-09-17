@@ -14,9 +14,9 @@ import { loadEnv } from "vite";
 // (e.g. Vercel) do not receive the project's .env file, which previously left
 // the production bundle with no Supabase URL/key at all. Real environment
 // variables of the same name always win over these fallbacks.
-const SUPABASE_URL_FALLBACK = "https://zuivljcbyjckkrqyiznr.supabase.co";
+const SUPABASE_URL_FALLBACK = "https://hnabjzqzfimxepbyycfx.supabase.co";
 const SUPABASE_PUBLISHABLE_KEY_FALLBACK =
-  "sb_publishable_cBVNA2usrq2H713DbLQBuA_21I9cJSu";
+  "sb_publishable_AT4OIfr1L75T3Z00Mr1eKA_Z7qTKv45";
 
 // The lovable wrapper takes a plain options object, so env is resolved eagerly.
 const env = loadEnv(
