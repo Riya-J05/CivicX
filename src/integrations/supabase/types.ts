@@ -75,26 +75,38 @@ export type Database = {
         Row: {
           challenge_id: string
           created_at: string
+          duration_seconds: number | null
+          evidence_type: string | null
           file_name: string | null
+          file_size: number | null
           file_type: string | null
           file_url: string
           id: string
+          uploaded_by: string | null
         }
         Insert: {
           challenge_id: string
           created_at?: string
+          duration_seconds?: number | null
+          evidence_type?: string | null
           file_name?: string | null
+          file_size?: number | null
           file_type?: string | null
           file_url: string
           id?: string
+          uploaded_by?: string | null
         }
         Update: {
           challenge_id?: string
           created_at?: string
+          duration_seconds?: number | null
+          evidence_type?: string | null
           file_name?: string | null
+          file_size?: number | null
           file_type?: string | null
           file_url?: string
           id?: string
+          uploaded_by?: string | null
         }
         Relationships: [
           {
@@ -102,6 +114,13 @@ export type Database = {
             columns: ["challenge_id"]
             isOneToOne: false
             referencedRelation: "challenges"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "challenge_evidence_uploaded_by_fkey"
+            columns: ["uploaded_by"]
+            isOneToOne: false
+            referencedRelation: "profiles"
             referencedColumns: ["id"]
           },
         ]

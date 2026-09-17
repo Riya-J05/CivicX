@@ -19,6 +19,8 @@ import {
 } from "@/lib/citizen-data";
 import { formatCoords, type SelectedLocation } from "@/lib/location";
 import { LocationPicker } from "./LocationPicker";
+import { VideoEvidence, type SelectedVideo, type VideoUploadStatus } from "./VideoEvidence";
+import { uploadVideoEvidence, videoErrorMessage } from "@/lib/video-evidence";
 
 import { AiAnalysis } from "./AiAnalysis";
 import {
@@ -100,6 +102,10 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
   const [draft, setDraft] = useState<ReportDraft>(emptyDraft);
   
   const [dragging, setDragging] = useState(false);
+  const [video, setVideo] = useState<SelectedVideo | null>(null);
+  const [videoStatus, setVideoStatus] = useState<VideoUploadStatus>("idle");
+  const [videoProgress, setVideoProgress] = useState(0);
+  const [videoError, setVideoError] = useState<string | null>(null);
   const fileInput = useRef<HTMLInputElement>(null);
 
   useEffect(() => {
@@ -119,6 +125,10 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
     setStep(0);
     setPhase("form");
     setDraft(emptyDraft);
+    setVideo(null);
+    setVideoStatus("idle");
+    setVideoProgress(0);
+    setVideoError(null);
     setError(null);
     setReceived(false);
     setAnalysis(null);
@@ -199,6 +209,27 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
     return null;
   };
 
+  /** Uploads the attached video (if any). Failures never lose the report. */
+  const sendVideo = async (id: string) => {
+    if (!video) return;
+    setVideoStatus("uploading");
+    setVideoProgress(0);
+    setVideoError(null);
+    try {
+      await uploadVideoEvidence({
+        challengeId: id,
+        file: video.file,
+        durationSeconds: video.durationSeconds,
+        onProgress: setVideoProgress,
+      });
+      setVideoStatus("done");
+    } catch (err) {
+      console.error("[civicx] video evidence upload failed", err);
+      setVideoStatus("failed");
+      setVideoError(videoErrorMessage(err instanceof Error ? err.message : "UPLOAD_FAILED"));
+    }
+  };
+
   const transmit = async () => {
     const problem = validate();
     if (problem) {
@@ -231,6 +262,8 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
           draft.evidence.map((e) => e.file),
         );
       }
+
+      await sendVideo(challenge.id);
 
       setChallengeId(challenge.id);
       window.dispatchEvent(new Event(CHALLENGE_CREATED_EVENT));
@@ -450,6 +483,15 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                             />
                           </div>
 
+                          <VideoEvidence
+                            value={video}
+                            onChange={setVideo}
+                            status={videoStatus}
+                            progress={videoProgress}
+                            errorMessage={videoError}
+                            onRetry={() => challengeId && void sendVideo(challengeId)}
+                          />
+
                           {draft.evidence.length > 0 && (
                             <div className="grid gap-2 sm:grid-cols-2">
                               {draft.evidence.map((f) => {
@@ -506,8 +548,10 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                             label="EVIDENCE"
                             value={
                               draft.evidence.length
-                                ? draft.evidence.map((f) => f.name).join(", ")
-                                : "No files attached"
+                                ? [...draft.evidence.map((f) => f.name), ...(video ? [video.name] : [])].join(", ")
+                                : video
+                                  ? video.name
+                                  : "No files attached"
                             }
                           />
 

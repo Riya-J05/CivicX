@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { AnimatePresence, motion, useReducedMotion } from "motion/react";
 import { FileText, MapPin, X } from "lucide-react";
+import { formatBytes, formatDuration } from "@/lib/video-evidence";
 import { PriorityChip, StatusChip } from "@/components/civicx/StatusChip";
 import { MissionProgress } from "@/components/civicx/MissionProgress";
 import { statusStage } from "@/lib/civicx-data";
@@ -208,19 +209,24 @@ export function MissionDetail({
                       <ul className="grid gap-2 sm:grid-cols-2">
                         {evidence.map((f) => (
                           <li key={f.id}>
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                const url = await getEvidenceUrl(f.file_url);
-                                if (url) window.open(url, "_blank", "noopener");
-                              }}
-                              className="flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left transition-colors hover:border-cyan/30"
-                            >
-                              <FileText className="h-4 w-4 shrink-0 text-cyan" />
-                              <span className="min-w-0 flex-1 truncate text-sm">
-                                {f.file_name ?? "Attachment"}
-                              </span>
-                            </button>
+                            {f.evidence_type === "video" ||
+                            (f.file_type ?? "").startsWith("video/") ? (
+                              <EvidenceVideo row={f} />
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const url = await getEvidenceUrl(f.file_url);
+                                  if (url) window.open(url, "_blank", "noopener");
+                                }}
+                                className="flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left transition-colors hover:border-cyan/30"
+                              >
+                                <FileText className="h-4 w-4 shrink-0 text-cyan" />
+                                <span className="min-w-0 flex-1 truncate text-sm">
+                                  {f.file_name ?? "Attachment"}
+                                </span>
+                              </button>
+                            )}
                           </li>
                         ))}
                       </ul>
@@ -250,6 +256,54 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
     <div className="glass-soft mt-3 rounded-xl p-4">
       <p className="mono-label text-muted-foreground">{label}</p>
       <div className="mt-2.5">{children}</div>
+    </div>
+  );
+}
+
+/** Private video evidence, played through a short-lived signed link. */
+function EvidenceVideo({ row }: { row: EvidenceRow }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    void getEvidenceUrl(row.file_url).then((signed) => {
+      if (!active) return;
+      if (signed) setUrl(signed);
+      else setFailed(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [row.file_url]);
+
+  const meta = [
+    row.file_size ? formatBytes(Number(row.file_size)) : null,
+    formatDuration(row.duration_seconds ? Number(row.duration_seconds) : null),
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  return (
+    <div className="rounded-xl border border-border p-2">
+      {url ? (
+        <video
+          src={url}
+          controls
+          preload="none"
+          playsInline
+          className="w-full rounded-lg bg-black/60"
+          style={{ maxHeight: 260 }}
+        />
+      ) : (
+        <div className="flex h-24 items-center justify-center rounded-lg bg-black/30 text-xs text-muted-foreground">
+          {failed ? "This video could not be loaded." : "Loading video…"}
+        </div>
+      )}
+      <p className="mt-2 truncate text-sm">{row.file_name ?? "Video evidence"}</p>
+      <p className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground">
+        {meta ? `VIDEO • ${meta}` : "VIDEO"}
+      </p>
     </div>
   );
 }
