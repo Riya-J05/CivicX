@@ -1438,7 +1438,6 @@ export const hindi: Record<string, string> = {
   "UPLOADING": "अपलोड हो रहा है",
   "UPLOAD COMPLETE": "अपलोड पूरा हुआ",
   "UPLOAD FAILED": "अपलोड विफल",
-  "RETRY": "पुनः प्रयास करें",
   "VIDEO": "वीडियो",
   "Remove video": "वीडियो हटाएँ",
   "Video evidence": "वीडियो साक्ष्य",
