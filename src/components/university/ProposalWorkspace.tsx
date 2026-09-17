@@ -95,6 +95,7 @@ export function ProposalWorkspace({
   const [proposal, setProposal] = useState<ProposalRow | null>(null);
   const [review, setReview] = useState<ProposalReviewRow | null>(null);
   const [draft, setDraft] = useState<ProposalDraft>(emptyDraft);
+  const { language } = useLanguage();
   const [loaded, setLoaded] = useState(false);
   const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string | null>(null);
@@ -161,7 +162,7 @@ export function ProposalWorkspace({
         setReviewing(false);
       }
     },
-    [load, onChanged],
+    [load, onChanged, language],
   );
 
   useEffect(() => {
