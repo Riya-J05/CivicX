@@ -1435,7 +1435,6 @@ export const hindi: Record<string, string> = {
   "START RECORDING": "रिकॉर्डिंग शुरू करें",
   "STOP RECORDING": "रिकॉर्डिंग रोकें",
   "RETAKE": "दोबारा लें",
-  "CANCEL": "रद्द करें",
   "UPLOADING": "अपलोड हो रहा है",
   "UPLOAD COMPLETE": "अपलोड पूरा हुआ",
   "UPLOAD FAILED": "अपलोड विफल",
