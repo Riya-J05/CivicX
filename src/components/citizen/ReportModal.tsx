@@ -397,12 +397,11 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                             />
                             <SpeechToTextButton
                               onText={(text) =>
-                                setDraft((d) => ({
-                                  ...d,
-                                  description: (d.description.trimEnd() ? `${d.description.trimEnd()} ` : "") + text,
-                                }).description.length <= MAX_DESC
-                                  ? { ...d, description: (d.description.trimEnd() ? `${d.description.trimEnd()} ` : "") + text }
-                                  : d)
+                                setDraft((d) => {
+                                  const base = d.description.trimEnd();
+                                  const next = (base ? `${base} ` : "") + text;
+                                  return next.length <= MAX_DESC ? { ...d, description: next } : d;
+                                })
                               }
                             />
                           </Field>
