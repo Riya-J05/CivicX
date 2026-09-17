@@ -208,19 +208,24 @@ export function MissionDetail({
                       <ul className="grid gap-2 sm:grid-cols-2">
                         {evidence.map((f) => (
                           <li key={f.id}>
-                            <button
-                              type="button"
-                              onClick={async () => {
-                                const url = await getEvidenceUrl(f.file_url);
-                                if (url) window.open(url, "_blank", "noopener");
-                              }}
-                              className="flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left transition-colors hover:border-cyan/30"
-                            >
-                              <FileText className="h-4 w-4 shrink-0 text-cyan" />
-                              <span className="min-w-0 flex-1 truncate text-sm">
-                                {f.file_name ?? "Attachment"}
-                              </span>
-                            </button>
+                            {f.evidence_type === "video" ||
+                            (f.file_type ?? "").startsWith("video/") ? (
+                              <EvidenceVideo row={f} />
+                            ) : (
+                              <button
+                                type="button"
+                                onClick={async () => {
+                                  const url = await getEvidenceUrl(f.file_url);
+                                  if (url) window.open(url, "_blank", "noopener");
+                                }}
+                                className="flex w-full items-center gap-3 rounded-xl border border-border px-3 py-2.5 text-left transition-colors hover:border-cyan/30"
+                              >
+                                <FileText className="h-4 w-4 shrink-0 text-cyan" />
+                                <span className="min-w-0 flex-1 truncate text-sm">
+                                  {f.file_name ?? "Attachment"}
+                                </span>
+                              </button>
+                            )}
                           </li>
                         ))}
                       </ul>
