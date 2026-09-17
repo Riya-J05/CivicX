@@ -33,6 +33,18 @@ export const LANGUAGE_LABELS: Record<Language, string> = {
 
 const STORAGE_KEY = "civicx.language";
 
+/**
+ * Hand-tuned wording for headlines that are split across styled fragments,
+ * so the Hindi sentence still reads in the right order.
+ */
+const overrides: Record<string, string> = {
+  "Turn Real-World Problems Into": "असली दुनिया की समस्याओं को बदलें",
+  "Real-World Solutions.": "असली समाधानों में।",
+  "Choose Your": "चुनें अपनी",
+  "Mission Role.": "मिशन भूमिका।",
+  Language: "भाषा",
+};
+
 /** Translates one string. Unknown wording falls back to the English source. */
 export function translateText(value: string, language: Language): string {
   if (language === "en") return value;
