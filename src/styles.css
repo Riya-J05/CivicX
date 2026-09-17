@@ -177,6 +177,35 @@
   ::selection {
     background: color-mix(in oklab, var(--neon-cyan) 35%, transparent);
   }
+
+  /* Hindi interface: Devanagari fonts, tighter tracking and safe wrapping so
+     longer translations never overflow cards, buttons, tables or dialogs. */
+  html[lang="hi"] body,
+  html[lang="hi"] h1,
+  html[lang="hi"] h2,
+  html[lang="hi"] h3,
+  html[lang="hi"] h4 {
+    font-family: "Noto Sans Devanagari", var(--font-sans);
+  }
+
+  html[lang="hi"] body {
+    overflow-wrap: anywhere;
+    word-break: normal;
+    line-height: 1.55;
+  }
+
+  html[lang="hi"] .mono-label,
+  html[lang="hi"] [class*="tracking-"],
+  html[lang="hi"] [class*="font-mono"] {
+    font-family: "Noto Sans Devanagari", var(--font-mono);
+    letter-spacing: 0.02em;
+    text-transform: none;
+  }
+
+  html[lang="hi"] button,
+  html[lang="hi"] a[class*="rounded"] {
+    line-height: 1.35;
+  }
 }
 
 @utility glass {
