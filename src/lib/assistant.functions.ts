@@ -8,7 +8,7 @@
  */
 
 import { createServerFn } from "@tanstack/react-start";
-import { callGemini } from "@/lib/ai-gateway.server";
+import { callGemini, type AiLanguage } from "@/lib/ai-gateway.server";
 import { requireSupabaseAuth } from "@/integrations/supabase/auth-middleware";
 
 
@@ -227,7 +227,12 @@ async function buildContext(
 export const askCivicxAi = createServerFn({ method: "POST" })
   .middleware([requireSupabaseAuth])
   .inputValidator(
-    (input: { question: string; history?: AssistantTurn[]; focus?: FocusInput }) => {
+    (input: {
+      question: string;
+      history?: AssistantTurn[];
+      focus?: FocusInput;
+      language?: string;
+    }) => {
       const question = String(input?.question ?? "").trim();
       if (question.length === 0) throw new Error("Type a question first.");
       const history = Array.isArray(input?.history)
@@ -245,6 +250,7 @@ export const askCivicxAi = createServerFn({ method: "POST" })
       return {
         question: question.slice(0, MAX_CHARS),
         history,
+        language: (input?.language === "hi" ? "hi" : "en") as AiLanguage,
         focus: {
           missionId: input?.focus?.missionId ?? null,
           teamId: input?.focus?.teamId ?? null,
@@ -272,6 +278,7 @@ export const askCivicxAi = createServerFn({ method: "POST" })
           feature: "assistant",
           system: systemPrompt(role, contextBlock),
           turns: [...data.history, { role: "user", content: data.question }],
+          language: data.language,
         }),
       );
     } catch {

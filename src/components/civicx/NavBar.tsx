@@ -4,6 +4,7 @@ import { Menu, X } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { cn } from "@/lib/utils";
 import { BrandLogo } from "./BrandLogo";
+import { LanguageToggle } from "./LanguageToggle";
 
 const links = [
   { label: "Explore Challenges", href: "#live-world" },
@@ -97,6 +98,7 @@ export function NavBar() {
               </a>
             );
           })}
+          <LanguageToggle className="ml-2" />
           <Link
             to="/access"
             className="ml-2 rounded-xl border border-cyan/35 bg-cyan/10 px-4 py-2 text-sm font-medium text-cyan transition-all duration-300 hover:bg-cyan/20 hover:shadow-[var(--shadow-glow-cyan)] active:scale-[0.97]"
@@ -134,6 +136,10 @@ export function NavBar() {
                     {l.label}
                   </a>
                 ))}
+                <div className="flex items-center justify-between gap-2 px-3 py-2.5">
+                  <span className="text-sm text-muted-foreground">Language</span>
+                  <LanguageToggle showIcon={false} />
+                </div>
                 <Link
                   to="/access"
                   onClick={() => setOpen(false)}
