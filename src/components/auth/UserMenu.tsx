@@ -5,6 +5,7 @@ import { useQueryClient } from "@tanstack/react-query";
 import { LogOut, Radar, Settings, User } from "lucide-react";
 import { useAuth } from "@/lib/auth-context";
 import { roleById } from "@/lib/civicx-roles";
+import { LanguageToggle } from "@/components/civicx/LanguageToggle";
 
 function initialsFor(name: string | null | undefined, email: string | null | undefined) {
   const source = (name ?? email ?? "").trim();
@@ -93,6 +94,10 @@ export function UserMenu({
             transition={{ duration: 0.22, ease: [0.16, 1, 0.3, 1] }}
             className="glass absolute bottom-[calc(100%+0.5rem)] left-0 z-50 w-full overflow-hidden rounded-xl p-1.5"
           >
+            <div className="flex items-center justify-between gap-2 rounded-lg px-3 py-2.5">
+              <span className="text-sm text-muted-foreground">Language</span>
+              <LanguageToggle showIcon={false} />
+            </div>
             <Link
               to="/profile"
               onClick={() => setOpen(false)}
