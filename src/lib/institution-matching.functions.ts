@@ -175,6 +175,7 @@ export const matchInstitutions = createServerFn({ method: "POST" })
           `Solution directions: ${(challenge.solution_directions ?? []).join("; ") || "none"}`,
           `Location: ${[challenge.location_name, challenge.locality, challenge.city, challenge.state].filter(Boolean).join(", ") || "not provided"}`,
         ].join("\n"),
+        data.language,
       );
       const parsed = JSON.parse(extractJson(raw, "{")) as Record<string, unknown>;
       const domains = stringList(parsed["domains"], 3);
@@ -247,6 +248,7 @@ export const matchInstitutions = createServerFn({ method: "POST" })
               ].join("\n"),
             ),
           ].join("\n"),
+          data.language,
         );
         const list = JSON.parse(extractJson(raw, "[")) as unknown;
         if (Array.isArray(list)) {
