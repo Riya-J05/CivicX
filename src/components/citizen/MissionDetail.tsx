@@ -259,3 +259,51 @@ function Block({ label, children }: { label: string; children: React.ReactNode }
     </div>
   );
 }
+
+/** Private video evidence, played through a short-lived signed link. */
+function EvidenceVideo({ row }: { row: EvidenceRow }) {
+  const [url, setUrl] = useState<string | null>(null);
+  const [failed, setFailed] = useState(false);
+
+  useEffect(() => {
+    let active = true;
+    void getEvidenceUrl(row.file_url).then((signed) => {
+      if (!active) return;
+      if (signed) setUrl(signed);
+      else setFailed(true);
+    });
+    return () => {
+      active = false;
+    };
+  }, [row.file_url]);
+
+  const meta = [
+    row.file_size ? formatBytes(Number(row.file_size)) : null,
+    formatDuration(row.duration_seconds ? Number(row.duration_seconds) : null),
+  ]
+    .filter(Boolean)
+    .join(" • ");
+
+  return (
+    <div className="rounded-xl border border-border p-2">
+      {url ? (
+        <video
+          src={url}
+          controls
+          preload="none"
+          playsInline
+          className="w-full rounded-lg bg-black/60"
+          style={{ maxHeight: 260 }}
+        />
+      ) : (
+        <div className="flex h-24 items-center justify-center rounded-lg bg-black/30 text-xs text-muted-foreground">
+          {failed ? "This video could not be loaded." : "Loading video…"}
+        </div>
+      )}
+      <p className="mt-2 truncate text-sm">{row.file_name ?? "Video evidence"}</p>
+      <p className="font-mono text-[10px] tracking-[0.14em] text-muted-foreground">
+        {meta ? `VIDEO • ${meta}` : "VIDEO"}
+      </p>
+    </div>
+  );
+}
