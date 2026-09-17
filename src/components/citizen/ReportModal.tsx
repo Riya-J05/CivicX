@@ -381,6 +381,14 @@ export function ReportModal({ open, onClose }: { open: boolean; onClose: () => v
                               placeholder="Waste overflow near Rohini Sector 7"
                               className="w-full bg-transparent text-sm outline-none placeholder:text-muted-foreground/60"
                             />
+                            <SpeechToTextButton
+                              onText={(text) =>
+                                setDraft((d) => {
+                                  const base = d.title.trimEnd();
+                                  return { ...d, title: base ? `${base} ${text}` : text };
+                                })
+                              }
+                            />
                           </Field>
 
                           <Field
