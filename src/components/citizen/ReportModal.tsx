@@ -20,6 +20,7 @@ import {
 import { formatCoords, type SelectedLocation } from "@/lib/location";
 import { LocationPicker } from "./LocationPicker";
 import { VideoEvidence, type SelectedVideo, type VideoUploadStatus } from "./VideoEvidence";
+import { SpeechToTextButton } from "./SpeechToText";
 import { uploadVideoEvidence, videoErrorMessage } from "@/lib/video-evidence";
 
 import { AiAnalysis } from "./AiAnalysis";

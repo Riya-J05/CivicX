@@ -1453,4 +1453,11 @@ export const hindi: Record<string, string> = {
   "The video uploaded but we could not save its record. Please try again.": "वीडियो अपलोड हो गया पर उसका रिकॉर्ड सहेजा नहीं जा सका। कृपया पुनः प्रयास करें।",
   "Video storage is unavailable right now. Please try again later.": "वीडियो स्टोरेज अभी उपलब्ध नहीं है। कृपया बाद में प्रयास करें।",
   "The video upload failed. Check your connection and retry.": "वीडियो अपलोड विफल रहा। अपना कनेक्शन जाँचें और पुनः प्रयास करें।",
+  "Speak": "बोलें",
+  "Listening… Tap to stop": "सुन रहे हैं… रोकने के लिए टैप करें",
+  "Stop speaking": "बोलना बंद करें",
+  "Speech input isn't supported in this browser. You can type your report instead.": "इस ब्राउज़र में वॉइस इनपुट समर्थित नहीं है। आप अपनी रिपोर्ट टाइप कर सकते हैं।",
+  "Microphone permission denied. Allow microphone access and try again.": "माइक्रोफ़ोन की अनुमति अस्वीकृत हो गई। माइक्रोफ़ोन एक्सेस दें और पुनः प्रयास करें।",
+  "No speech detected. Try again.": "कोई आवाज़ नहीं मिली। पुनः प्रयास करें।",
+  "Speech recognition failed. Try again.": "वॉइस पहचान विफल रही। पुनः प्रयास करें।",
 };
